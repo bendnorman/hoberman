@@ -2,7 +2,7 @@
 ## Inspiration
 The Hoberman sphere is a complex and intriguing toy with a very simple operation.  I wanted to provide this toy with some autonomy and character by allowing it to open and close without a human physically opening and closing it. My plan was to connect the sphere to a servo motor with fishing line to give the effect that the sphere is floating and moving on its own. My initial idea for the interaction was to open and close the sphere using a controller called a [Leap Motion](https://www.leapmotion.com/). I wanted to give the user the feeling of opening and closing the sphere with their fist. 
 
-TODO: Insert Photo of drawing
+![alt text](imgs/drawing.jpg)
 
 ## Actuator
 
