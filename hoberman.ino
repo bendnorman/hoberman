@@ -1,53 +1,63 @@
-#include <Wire.h>
 #include <Servo.h>
 
+/////Servo Setup//////
 
-Servo myservo;  // create servo object to control a servo
-// twelve servo objects can be created on most boards
+Servo myservo;
 
-int lower_bound = 35;
-int upper_bound = 135;
+int servo_lower_bound = 35;
+int servo_upper_bound = 135;
 
-int pos = 0;    // variable to store the servo position
-int adjusted_reading = 0;
 
-int trigPin = 11;    // Trigger
-int echoPin = 12;    // Echo
-long duration, cm, inches;
+//////Microphone Setup/////////
+// selecting the analog input pin
+const int inputPin = A0;
+// size of the window
+const int inputWindow = 100;
+// placeholder for a single measurement
+unsigned int inputSample;
+
+int audio_lower_bound = 0;
+int audio_upper_bound = 200;
+
+int diff = 0;
 
 void setup() {
+  // initializing the analog input
+  pinMode(inputPin, INPUT);
+  // initializing the serial communication
   Serial.begin(9600);
-
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
   myservo.attach(9);
+//  myservo.write(servo_lower_bound);
 }
 
-
 void loop() {
-  // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
-  // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(5);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
 
-  // Read the signal from the sensor: a HIGH pulse whose
-  // duration is the time (in microseconds) from the sending
-  // of the ping to the reception of its echo off of an object.
-  pinMode(echoPin, INPUT);
-  duration = pulseIn(echoPin, HIGH);
+  // two variables for minimum and maximum values in window
+  unsigned int inputMax = 0;
+  unsigned int inputMin = 1024;
 
-  // Convert the time into a distance
-  cm = (duration / 2) / 29.1;   // Divide by 29.1 or multiply by 0.0343
-  inches = (duration / 2) / 74; // Divide by 74 or multiply by 0.0135
-
-  adjusted_reading = adjusted_reading * 0.9 + inches * 0.1;
-  Serial.println(adjusted_reading);
-  pos = map(adjusted_reading, 25, 0, lower_bound, upper_bound);
-
-  myservo.write(pos);
+  // loop for the window
+  for (unsigned int i = 0; i < inputWindow; i++) {
+    // read in a single value
+    inputSample = analogRead(inputPin);
+    // get the minimum and maximum value
+    inputMin = min(inputMin, inputSample);
+    inputMax = max(inputMax, inputSample);
+  }
   
-  delay(30);
+    diff = diff * 0.9 + (inputMax - inputMin) * 0.1;
+//    diff = (inputMax - inputMin);
+  
+  // send the values on serial
+  Serial.print("  Diff: ");
+  Serial.print(diff);
+  Serial.println();
+  
+  
+  int pos = map(diff, audio_lower_bound, audio_upper_bound, servo_lower_bound, servo_upper_bound);  
+  
+  Serial.print("  Pos: ");
+  Serial.println(pos);
+  
+  myservo.write(pos);
 }
