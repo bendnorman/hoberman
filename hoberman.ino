@@ -1,3 +1,9 @@
+/*
+Electret Micropone Amplifier code from: http://electropit.com/index.php/2015/12/20/fc-109-max9812-microphone-amplifier-module/
+
+*/
+
+
 #include <Servo.h>
 
 /////Servo Setup//////
